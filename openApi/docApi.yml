@@ -1,0 +1,978 @@
+openapi: '3.0.2'
+info:
+  version: "0.1.0"
+  title: "Kalinko Gesion Scolaire Test"  
+  description: "Un mini syteme  de gestion de base de données scolaire qui nous pemet de faire la gestion des etudians, la gestion de "
+  contact:
+    name: "Kalinko API School"
+    email: "contact@kalinkotech.com"
+servers:
+  - url: http://kalinko-school/api/v1
+components:
+  schemas:
+    Student:
+      required:
+        - id
+        - email
+        - password
+        - first_name
+        - last_name
+        - age
+        - gender
+
+      type: object
+      properties:
+        id:
+          type: integer
+          format: Int32
+        first_name:
+          type: string
+        last_name:
+          type: string
+        gender:
+          type: string
+          enum:
+                - "M"
+                - "F"
+        age:
+          type: integer
+        contact_address:
+          type: string
+        email:  
+          type: string
+        password:
+          type: string
+          format: password
+    Instructor:
+      required:
+        - id
+        - email
+        - password
+        - first_name
+        - last_name
+        - age
+        - gender
+      type: object
+      properties:
+        id:
+         type: integer
+         format: Int32
+        first_name:
+          type: string
+        last_name:
+          type: string
+        gender:
+          type: string
+          enum:
+                - "M"
+                - "F"
+        age:
+          type: integer
+        contact_address:
+          type: integer
+        email:  
+          type: string
+        password:
+          type: string
+          format: password
+    Course:
+      required:
+        - id
+        - course_name
+        - school_year      
+      type: object
+      properties:
+        id:
+          type: integer
+          format: Int32
+        course_name:
+          type: string
+        course_description:
+          type: string
+        school_year:
+          type: string
+          format: date
+    Subject:
+      required:
+        - "id"
+        - "name"
+        - "course_id"
+      type: object
+      properties:
+        id:
+          type: integer
+          format: Int32
+        name:
+          type: string
+        course_id:  
+            $ref: '#/components/schemas/Course'
+    Schedule:
+      required:
+        - "id"
+        - "course_id"
+        - "subject_id"
+        - "instructor_id"
+        - "student_id"
+        - "day"
+        - "time_start"
+        - "time_end"
+      type: object
+      properties:
+        id:
+          type: integer
+          format: Int32
+        course_id:  
+          $ref: '#/components/schemas/Course'
+        subject_id:
+          $ref: '#/components/schemas/Subject'
+        instructor_id:
+          $ref: '#/components/schemas/Subject'
+        student_id:
+           $ref: '#/components/schemas/Student'
+        day: 
+          type: string
+          format: date
+        time_start:
+          type: string
+          format: date-time
+        time_end:
+          type: string
+          format: date-time
+    Transaction:
+      type: object
+      required:
+        - "id"
+        - "date"
+        - "transaction_name"
+      properties:
+        id:
+          type: integer
+          format: Int32
+        transaction_name:
+          type: string
+        date: 
+          type: string
+          format: date
+        student_id:
+           $ref: '#/components/schemas/Student'
+paths:
+   # student paths
+  /students:
+     get:
+      tags:
+      - "Student"
+      description: Return all students
+      summary: List of Student
+      operationId: listStudent
+      responses:
+        '200':
+          description: get all students response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+        default:
+          description: error payload
+          content:
+            'application/json':
+              schema:
+                type: string
+                format: Message 
+     post:
+      tags:
+      - "Student"
+      description: Add a new student
+      summary: Create a Student
+      requestBody:
+        description: body content for adding a new student
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Student'
+            examples:
+              student:
+                summary: Student  Example
+                value: {
+                  "id": 0,
+                  "first_name": "Aliou",
+                  "last_name": "Barry",
+                  "gender": "M",
+                  "age": 12,
+                  "contact_address": "+224 628909782",
+                  "email": "barryaliou980@gmail.com",
+                  "password": "12345"
+                }
+      responses:
+       '200':
+          description: get all students response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+  /students/{student}:
+     get:
+      tags:
+      - "Student"
+      description: Get student by Id
+      summary: Find a Student
+      operationId: findStudent
+      parameters:
+        - name: student
+          in: path
+          description: ID of the student to fetch
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        '200':
+          description: find student by ID students response
+          content:
+            'application/json' :
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Student'
+        default:
+          description: error payload
+          content:
+            'application/json':
+              schema:
+                type: string
+                format: Message 
+     put:
+      tags:
+      - "Student"
+      description: Update student by Id
+      summary: Update a Student
+      operationId: updateStudent
+      parameters:
+        - name: student
+          in: path
+          description: ID of the student to Update
+          required: true
+          schema:
+            type: integer
+          style: simple
+      requestBody:
+        description: body content for updateStudent a student
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Student'
+            examples:
+              student:
+                summary: Student  Example
+                value: {
+                  "id": 0,
+                  "first_name": "Aliou update",
+                  "last_name": "Barry ",
+                  "gender": "M",
+                  "age": 12,
+                  "contact_address": "+224 628909782",
+                  "email": "barryaliou980@gmail.com",
+                  "password": "12345"
+                }
+   
+      responses:
+       '200':
+          description: get all students response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+     delete:
+          tags:
+          - "Student"
+          description: delete student by Id
+          summary: delete a Student
+          operationId: deleteStudent
+          parameters:
+            - name: student
+              in: path
+              description: ID of the student to delete
+              required: true
+              schema:
+                type: integer
+              style: simple
+          responses:
+           '200':
+              description: get all students response
+              content:
+                'application/json' :
+                  schema:
+                    type: string
+                    format: message                 
+  
+ # Instructor paths
+  /instructors:
+     get:
+      tags:
+      - "Instructor"
+      description: Return all instructors
+      summary: List of instructors
+      operationId: listInstructors
+      responses:
+        '200':
+          description: get all instructors response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instructor'
+        default:
+          description: error payload
+          content:
+            'application/json':
+              schema:
+                type: string
+                format: Message 
+     post:
+      tags:
+      - "Instructor"
+      description: Add a new instructor
+      summary: Create a instructor
+      requestBody:
+        description: body content for adding a new instructor
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Instructor'
+            examples:
+              instructor:
+                summary: inspector  Example
+                value: {
+                  "id": 0,
+                  "first_name": "Aliou",
+                  "last_name": "Barry",
+                  "gender": "M",
+                  "age": 12,
+                  "contact_address": "+224 628909782",
+                  "email": "barryaliou980@gmail.com",
+                  "password": "12345"
+                }
+      responses:
+       '200':
+          description: get all instructors response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instructor'
+  /instructors/{instructor}:
+     get:
+      tags:
+      - "Instructor"
+      description: Get instructor by Id
+      summary: Find a instructor
+      operationId: findInstructor
+      parameters:
+        - name: instructor
+          in: path
+          description: ID of the instructor to fetch
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        '200':
+          description: find Instructor by ID Instructors response
+          content:
+            'application/json' :
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Instructor'
+
+     put:
+      tags:
+      - "Instructor"
+      description: Update Instructor by Id
+      summary: Update a instructor
+      operationId: updateInstructor
+      parameters:
+        - name: instructor
+          in: path
+          description: ID of the instructor to Update
+          required: true
+          schema:
+            type: integer
+          style: simple
+      requestBody:
+        description: body content for updateInstructor a Instructor
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Instructor'
+            examples:
+              instructor:
+                summary: Instructor  Example
+                value: {
+                  "id": 0,
+                  "first_name": "Aliou update",
+                  "last_name": "Barry ",
+                  "gender": "M",
+                  "age": 12,
+                  "contact_address": "+224 628909782",
+                  "email": "barryaliou980@gmail.com",
+                  "password": "12345"
+                }
+   
+      responses:
+       '200':
+          description: get all Instructors response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instructor'
+     delete:
+          tags:
+          - "Instructor"
+          description: delete instructor by Id
+          summary: delete a Instructor
+          operationId: deleteInstructor
+          parameters:
+            - name: instructor
+              in: path
+              description: ID of the instructor to delete
+              required: true
+              schema:
+                type: integer
+              style: simple
+          responses:
+           '200':
+              description: get all instructors response
+              content:
+                'application/json' :
+                  schema:
+                    type: string
+                    format: message
+                   
+ # Course paths
+  /courses:
+     get:
+      tags:
+      - "Course"
+      description: Return all courses
+      summary: List of Course
+      operationId: listCourse
+      responses:
+        '200':
+          description: get all courses response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+     post:
+      tags:
+      - "Course"
+      description: Add a new Course
+      summary: Create a Course
+      requestBody:
+        description: body content for adding a new Course
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Course'
+            examples:
+              student:
+                summary: Student  Example
+                value:  {
+                  "id": 1,
+                  "course_name": "Anglais",
+                  "course_description": "English course",
+                  "school_year": 2023
+                }
+      responses:
+       '200':
+          description: get all course response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Course'
+  /courses/{course}:
+     get:
+      tags:
+      - "Course"
+      description: Get course by Id
+      summary: Find a course
+      operationId: findCourse
+      parameters:
+        - name: course
+          in: path
+          description: ID of the student to fetch
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        '200':
+          description: find student by ID course response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Course'
+     put:
+      tags:
+      - "Course"
+      description: Update Course by Id
+      summary: Update a Course
+      operationId: updateCourse
+      parameters:
+        - name: course
+          in: path
+          description: ID of the Course to Update
+          required: true
+          schema:
+            type: integer
+          style: simple
+      requestBody:
+        description: body content for updateCourse a course
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Course'
+            examples:
+              course:
+                summary: Course  Example
+                value: {
+                  "id": 1,
+                  "course_name": "Anglais",
+                  "course_description": "English course",
+                  "school_year": 2023
+                }
+      responses:
+       '200':
+          description: update course response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+     delete:
+          tags:
+          - "Course"
+          description: delete course by Id
+          summary: delete a course
+          operationId: deleteCourse
+          parameters:
+            - name: course
+              in: path
+              description: ID of the Course to delete
+              required: true
+              schema:
+                type: integer
+              style: simple
+          responses:
+           '200':
+              description: delete a course response
+              content:
+                'application/json' :
+                  schema:
+                    type: string
+                    format: message                 
+  
+  # Subject paths
+  /subjects:
+     get:
+      tags:
+      - "Subject"
+      description: Return all subjects
+      summary: List of Subject
+      operationId: listSubject
+      responses:
+        '200':
+          description: get all subjects response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subject'
+     post:
+      tags:
+      - "Subject"
+      description: Add a new Subject
+      summary: Create a Subject
+      requestBody:
+        description: body content for adding a new Subject
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Subject'
+            examples:
+              student:
+                summary: Student  Example
+                value:  {
+                  "id": 1,
+                  "name": "Sujet Anglais",
+                  "course_id": 1
+                }
+      responses:
+       '200':
+          description: get all course response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Subject'
+  /subjects/{subject}:
+     get:
+      tags:
+      - "Subject"
+      description: Get subject by Id
+      summary: Find a subject
+      operationId: findSubject
+      parameters:
+        - name: subject
+          in: path
+          description: ID of the subject to fetch
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        '200':
+          description: find student by ID subject response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Subject'
+     put:
+      tags:
+      - "Subject"
+      description: Update Subject by Id
+      summary: Update a subject
+      operationId: updateSubject
+      parameters:
+        - name: subject
+          in: path
+          description: ID of the Subject to Update
+          required: true
+          schema:
+            type: integer
+          style: simple
+      requestBody:
+        description: body content for updateCourse a course
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Subject'
+            examples:
+              subject:
+                summary: Subject  Example
+                value: {
+                  "id": 1,
+                  "name": "sujet Anglais update",
+                  "course_id": 2
+    
+                }
+      responses:
+       '200':
+          description: update subject response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subject'
+     delete:
+          tags:
+          - "Subject"
+          description: delete Subject by Id
+          summary: delete a Subject
+          operationId: deleteSubject
+          parameters:
+            - name: subject
+              in: path
+              description: ID of the subject to delete
+              required: true
+              schema:
+                type: integer
+              style: simple
+          responses:
+           '200':
+              description: delete a subject response
+              content:
+                'application/json' :
+                  schema:
+                    type: string
+                    format: message                 
+  
+
+    # Schedule paths
+  /schedules:
+     get:
+      tags:
+      - "Schedule"
+      description: Return all schedules
+      summary: List of Schedules
+      operationId: listSchedule
+      responses:
+        '200':
+          description: get all Schedules response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+     post:
+      tags:
+      - "Schedule"
+      description: Add a new Schedule
+      summary: Create a Schedule
+      requestBody:
+        description: body content for adding a new Schedule
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Schedule'
+            examples:
+              student:
+                summary: Student  Example
+                value:  {
+                  "id": 1,
+                  "subject_id": 1,
+                  "course_id": 1,
+                  "instructor_id": 1,
+                  "student_id": 1,
+                  "day":"12/12/2022",
+                  "time_start": "12pm",
+                  "time_end": "13pm"
+                }
+      responses:
+       '200':
+          description: get all schedules response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Schedule'
+  /schedules/{schedule}:
+     get:
+      tags:
+      - "Schedule"
+      description: Get Schedule by Id
+      summary: Find a Schedule
+      operationId: findSchedule
+      parameters:
+        - name: schedule
+          in: path
+          description: ID of the Schedule to fetch
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        '200':
+          description: find schedule by ID subject response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Subject'
+     put:
+      tags:
+      - "Schedule"
+      description: Update Schedule by Id
+      summary: Update a Schedule
+      operationId: updateSchedule
+      parameters:
+        - name: schedule
+          in: path
+          description: ID of the Schedule to Update
+          required: true
+          schema:
+            type: integer
+          style: simple
+      requestBody:
+        description: body content for update a course
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Schedule'
+            examples:
+              schedule:
+                summary: Subject  Example
+                value:  {
+                  "id": 1,
+                  "subject_id": 1,
+                  "course_id": 1,
+                  "instructor_id": 1,
+                  "student_id": 1,
+                  "day":"12/12/2022",
+                  "time_start": "12pm",
+                  "time_end": "13pm"
+                }
+      responses:
+       '200':
+          description: update Schedule response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+     delete:
+          tags:
+          - "Schedule"
+          description: delete Schedule by Id
+          summary: delete a Schedule
+          operationId: deleteSchedule
+          parameters:
+            - name: schedule
+              in: path
+              description: ID of the Schedule to delete
+              required: true
+              schema:
+                type: integer
+              style: simple
+          responses:
+           '200':
+              description: delete a Schedule response
+              content:
+                'application/json' :
+                  schema:
+                    type: string
+                    format: message                 
+  
+  
+      # Schedule paths
+  /transactions:
+     get:
+      tags:
+      - "Transaction"
+      description: Return all Transactions
+      summary: List of Transactions
+      operationId: listTransaction
+      responses:
+        '200':
+          description: get all Transactions response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+     post:
+      tags:
+      - "Transaction"
+      description: Add a new Transaction
+      summary: Create a Transaction
+      requestBody:
+        description: body content for adding a new Transaction
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Transaction'
+            examples:
+              student:
+                summary: Student  Example
+                value:  {
+                  "id": 1,
+                  "student_id": 1,
+                  "transaction_name":"frais de scolarite",
+                  "date": "12pm",
+                }
+      responses:
+       '200':
+          description: get all transactions response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Transaction'
+  /transactions/{transaction}:
+     get:
+      tags:
+      - "Transaction"
+      description: Get Transaction by Id
+      summary: Find a Transaction
+      operationId: findTransaction
+      parameters:
+        - name: transaction
+          in: path
+          description: ID of the transaction to fetch
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        '200':
+          description: find transaction by ID Transaction response
+          content:
+            'application/json' :
+              schema:
+                  $ref: '#/components/schemas/Transaction'
+     put:
+      tags:
+      - "Transaction"
+      description: Update Transaction by Id
+      summary: Update a Transaction
+      operationId: updateTransaction
+      parameters:
+        - name: transaction
+          in: path
+          description: ID of the Transaction to Update
+          required: true
+          schema:
+            type: integer
+          style: simple
+      requestBody:
+        description: body content for update a transaction
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Transaction'
+            examples:
+              transaction:
+                summary: Subject  Example
+                value:   {
+                  "id": 1,
+                  "student_id": 1,
+                  "transaction_name":"frais de scolarite",
+                  "date": "12pm",
+                }
+      responses:
+       '200':
+          description: update transaction response
+          content:
+            'application/json' :
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+     delete:
+          tags:
+          - "Transaction"
+          description: delete Transaction by Id
+          summary: delete a Transaction
+          operationId: deleteTransaction
+          parameters:
+            - name: transaction
+              in: path
+              description: ID of the Transaction to delete
+              required: true
+              schema:
+                type: integer
+              style: simple
+          responses:
+           '200':
+              description: delete a transaction response
+              content:
+                'application/json' :
+                  schema:
+                    type: string
+                    format: message                 
+  
+  

@@ -1,0 +1,28 @@
+#! /usr/bin/env bash
+
+echo "Running PHP CS Fixer pre-commit hook..."
+
+PHP_CS_FIXER="vendor/bin/php-cs-fixer"
+PHP_CS_FIXER_CONFIG="php-cs-fixer.php"
+
+if [ ! -f "$PHP_CS_FIXER_CONFIG" ]; then
+	echo "\033[0;31mERROR:\033[0m PHP CS Fixer config file was not found at $PHP_CS_FIXER_CONFIG"
+	echo "Aborting commit."
+	exit 1
+fi
+
+if [ ! -x "$PHP_CS_FIXER" ]; then
+	echo "\033[0;31mERROR:\033[0m PHP CS Fixer was not found at $PHP_CS_FIXER"
+	echo "Aborting commit."
+	exit 1
+fi
+
+# composer format:dry-run
+
+# if [ ! $? -eq 0 ]; then
+#     echo "\033[0;31mERROR:\033[0m PHP CS Fixer reported an error."
+# 	echo "Aborting commit."
+# 	exit 1
+# fi
+
+echo "Done running PHP CS Fixer pre-commit hook!"
